@@ -23,7 +23,7 @@ void readFile(struct lottery *l){
   
   fp = fopen(l->drawer_file.c_str(), "r");
   if(fp == NULL){
-    perror("文件不存在或打开文件发生错误!");
+    perror("fopen()");
     exit(-1);
   }
 
@@ -33,6 +33,7 @@ void readFile(struct lottery *l){
     l->v.push_back(string(buffer));
   }
 
+  fclose(fp);
   l->drawer_num = l->v.size();
   cout << "目前一共" << l->drawer_num << "位抽奖者" << endl;
 }
@@ -80,7 +81,7 @@ void lottery_drawing_2(struct lottery *l){
 
 void lottery_help(){
   cout << "Usage: lottery [options] filename [lottery method]random|pick" << endl;
-  cout << "Lottery method default is random, but your choose pick/Ctrl-c pick the winner";
+  cout << "Lottery method default is random, but your choose pick/Ctrl-c pick the winner" << endl;
   cout << "Options:" << endl;
   cout << "--h --help Display this information." << endl;
 }
@@ -89,12 +90,12 @@ int main(int argc, char **argv){
 
   l = (struct lottery*)malloc(sizeof(struct lottery));
   if(l == NULL){
-    perror("内存分配失败!");
+    perror("malloc()");
     return -1;
   }
 
   if(argc < 2){
-    perror("参数不足!");
+    cout << "Params are missing!" << endl;
     lottery_help();
     return -1;
   }
@@ -102,7 +103,7 @@ int main(int argc, char **argv){
 
   if(strcmp(argv[1], "--h") == 0 || strcmp(argv[1], "--help") == 0){
     lottery_help();
-  }else if(argc == 3 && strcmp(argv[2], "pick") == 0){
+  }else if(argc > 2 && strcmp(argv[2], "pick") == 0){
     signal(SIGINT, signalHandler);
     string filename = argv[1];
     l->drawer_file = filename;

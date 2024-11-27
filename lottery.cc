@@ -1,17 +1,13 @@
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <time.h>
 #include <vector>
 #include <cstring>
 #include <csignal>
-#include <unistd.h>
+#include <chrono>
+#include <sys/time.h>
 
 using namespace std;
 
 struct lottery{
-  int type;//1轮 2抽
   string drawer_file;//抽奖人员名单文件
   int drawer_num;//抽奖人员数量
   string winner;
@@ -50,7 +46,12 @@ void winner_result(string winner){
 }
 
 void lottery_drawing(struct lottery *l){
-  srand(time(0));
+  
+  struct timeval time_now {};
+  gettimeofday(&time_now, nullptr);
+  time_t msecs_time = (time_now.tv_sec * 1000) + (time_now.tv_usec / 1000);
+  srand(msecs_time);
+  //srand(time(0));
   int random_num = rand() % l->drawer_num;
   l->winner = l->v.at(random_num);
   winner_result(l->v.at(random_num));

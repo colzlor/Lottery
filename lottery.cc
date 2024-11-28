@@ -4,6 +4,8 @@
 #include <csignal>
 #include <chrono>
 #include <sys/time.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 using namespace std;
 
@@ -46,16 +48,68 @@ void winner_result(string winner){
   cout << "让我们恭喜 " << winner << endl;
 }
 
-void lottery_drawing(struct lottery *l){
-  
+unsigned long long get_sys_random_seed(){
+  unsigned long long seed;
+  int fd = open("/dev/random", O_RDONLY);
+  if (fd == -1) {
+      perror("open()");
+      exit(1);
+  }
+
+  int n = read(fd, (void*)&seed, sizeof(seed));
+  if (n == -1) {
+      perror("read()");
+      exit(1);
+  }
+  //  cout << seed << endl;
+  return seed;
+}
+
+int get_lucky_num(void)
+{
+  int random_num;
+
+  /**
+  srand(time(0));
+  **/
+
+  /**
   struct timeval time_now {};
   gettimeofday(&time_now, nullptr);
   time_t msecs_time = (time_now.tv_sec * 1000) + (time_now.tv_usec / 1000);
   srand(msecs_time);
-  //srand(time(0));
-  int random_num = rand() % l->drawer_num;
+  **/
+
+  unsigned long long seed = get_sys_random_seed();
+  srand(seed);
+  random_num = rand() % l->drawer_num;
+
+  return random_num;
+}
+
+void lottery_drawing(struct lottery *l){
+
+  int random_num = get_lucky_num();
   l->winner = l->v.at(random_num);
   winner_result(l->v.at(random_num));
+}
+
+
+void test_distribution(){
+  int arr[l->drawer_num];
+  int n = 0;
+  for(int i = 0; i < l->drawer_num; i++){
+    arr[i] = 0;
+  }
+
+  for(int i = 0; i < 500; i++){
+    n = get_lucky_num();
+    arr[n] += 1;
+  }
+
+  for(int i = 0; i < l->drawer_num; i++){
+    cout << arr[i] << endl;
+  }
 }
 
 
@@ -99,19 +153,19 @@ int main(int argc, char **argv){
     lottery_help();
     return -1;
   }
-
+  string filename = argv[1];
+  l->drawer_file = filename;
 
   if(strcmp(argv[1], "--h") == 0 || strcmp(argv[1], "--help") == 0){
     lottery_help();
+  }else if(argc > 2 && strcmp(argv[2], "test") == 0){
+    readFile(l);
+    test_distribution();
   }else if(argc > 2 && strcmp(argv[2], "pick") == 0){
     signal(SIGINT, signalHandler);
-    string filename = argv[1];
-    l->drawer_file = filename;
     readFile(l);
     lottery_drawing_2(l);
   }else{
-    string filename = argv[1];
-    l->drawer_file = filename;
     readFile(l);
     lottery_drawing(l);
   }

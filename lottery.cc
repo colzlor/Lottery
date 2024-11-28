@@ -10,8 +10,8 @@
 using namespace std;
 
 struct lottery{
-  string drawer_file;//抽奖人员名单文件
-  int drawer_num;//抽奖人员数量
+  string drawer_file;
+  int drawer_num;
   string winner;
   vector<string> v;
 };
@@ -37,15 +37,14 @@ void readFile(struct lottery *l){
 
   fclose(fp);
   l->drawer_num = l->v.size();
-  cout << "目前一共" << l->drawer_num << "位抽奖者" << endl;
+  //cout << "There are " << l->drawer_num << " drawers" << endl;
 }
 
 void winner_result(string winner){
   cout << endl;
   cout << "☆*:.｡.o(≧▽≦)o.｡.:*☆" << endl;
   cout << endl;
-  cout << "中奖者是: " << winner << endl;
-  cout << "让我们恭喜 " << winner << endl;
+  cout << "The winner is: " << winner << endl;
 }
 
 unsigned long long get_sys_random_seed(){
@@ -61,7 +60,7 @@ unsigned long long get_sys_random_seed(){
       perror("read()");
       exit(1);
   }
-  //  cout << seed << endl;
+  //cout << "random seed: " << seed << endl;
   return seed;
 }
 

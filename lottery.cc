@@ -32,7 +32,8 @@ void readFile(struct lottery *l){
   fseek(fp, 0 ,SEEK_SET);
 
   while(fgets(buffer, sizeof(buffer), fp) != NULL){
-    l->v.push_back(string(buffer));
+    l->v.push_back(buffer);
+    //cout << buffer << endl;
   }
 
   fclose(fp);
@@ -60,6 +61,8 @@ unsigned long long get_sys_random_seed(){
       perror("read()");
       exit(1);
   }
+  
+  close(fd);
   //cout << "random seed: " << seed << endl;
   return seed;
 }
@@ -152,8 +155,8 @@ int main(int argc, char **argv){
     lottery_help();
     return -1;
   }
-  string filename = argv[1];
-  l->drawer_file = filename;
+ 
+  l->drawer_file = argv[1];
 
   if(strcmp(argv[1], "--h") == 0 || strcmp(argv[1], "--help") == 0){
     lottery_help();
@@ -168,6 +171,8 @@ int main(int argc, char **argv){
     readFile(l);
     lottery_drawing(l);
   }
+
+  free(l);
   
 }
 

@@ -1,6 +1,6 @@
 # Lottery
 
-cd Lottery
+cd lottery
 
 make
 
